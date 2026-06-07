@@ -1,6 +1,6 @@
 import type { LessonDef } from '@/types'
 
-const JSON_SCHEMA = `{"zh":"your Mandarin reply","pinyin":"full pinyin with tone marks","en":"natural English translation","feedback":"1-2 sentences of kind encouraging feedback on their Chinese grammar or word choice. If they used English, gently encourage them to try Chinese. Empty string if no feedback needed.","vocab":[{"zh":"汉字","pinyin":"hànzì","en":"Chinese character"}],"corrected":false}`
+const JSON_SCHEMA = `{"zh":"your Mandarin reply — always end with a natural follow-up question to keep the conversation going","pinyin":"full pinyin with tone marks for zh","en":"natural English translation of zh","feedback":"1-2 sentences of kind encouraging feedback on the student's Chinese grammar or word choice. If they wrote in English, gently encourage them to try Chinese. Empty string if no feedback needed.","nativeSay":{"zh":"if the student wrote in Chinese or pinyin, rewrite their message the way a fluent native speaker would naturally say it. Empty string if they wrote in English, or if their Chinese was already perfectly natural.","pinyin":"pinyin for nativeSay zh, or empty string","en":"English translation of nativeSay zh, or empty string"},"vocab":[{"zh":"new word","pinyin":"pīnyīn","en":"meaning"}],"corrected":false}`
 
 function buildSystemPrompt(persona: string, scenario: string, hskLevel: number): string {
   const levelDesc =
@@ -13,6 +13,10 @@ function buildSystemPrompt(persona: string, scenario: string, hskLevel: number):
 ${scenario}
 
 Student level: ${levelDesc}. Match your language complexity to their level.
+
+Two rules to follow on every turn:
+1. Always end your reply ("zh") with a natural follow-up question — this keeps the conversation flowing.
+2. In "nativeSay", give a fluent native-speaker version of what the STUDENT just said (not your own reply). Leave it empty if they wrote in English or used perfectly natural Chinese already.
 
 IMPORTANT: Respond ONLY with valid JSON — no markdown fences, no extra text before or after:
 ${JSON_SCHEMA}`

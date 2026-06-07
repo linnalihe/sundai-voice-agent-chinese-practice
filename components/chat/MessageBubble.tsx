@@ -1,6 +1,6 @@
 'use client'
 
-import { IconBulb, IconPlayerPlay } from '@tabler/icons-react'
+import { IconBulb, IconPlayerPlay, IconMessageCircle } from '@tabler/icons-react'
 import type { DisplayMessage } from '@/types'
 
 interface MessageBubbleProps {
@@ -44,6 +44,22 @@ export function MessageBubble({ msg, onReplay }: MessageBubbleProps) {
             <span className="text-[12px] text-ink-muted italic block">{data.en}</span>
           )}
         </div>
+
+        {data.nativeSay?.zh && (
+          <div className="flex flex-col gap-1 bg-violet-50 border border-violet-200 rounded-lg px-2.5 py-2">
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-violet-700">
+              <IconMessageCircle size={12} aria-hidden />
+              A native speaker would say:
+            </div>
+            <span className="font-serif text-sm font-semibold text-ink">{data.nativeSay.zh}</span>
+            {data.nativeSay.pinyin && (
+              <span className="font-mono text-[11px] text-ink-faint">{data.nativeSay.pinyin}</span>
+            )}
+            {data.nativeSay.en && (
+              <span className="text-[11px] text-ink-muted italic">{data.nativeSay.en}</span>
+            )}
+          </div>
+        )}
 
         {data.feedback && (
           <div className="flex items-start gap-1.5 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 text-xs text-green-800 leading-snug">

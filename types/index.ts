@@ -4,12 +4,20 @@ export interface Message {
   content: string
 }
 
+// Native-speaker rephrasing of the student's message
+export interface NativeSay {
+  zh: string
+  pinyin: string
+  en: string
+}
+
 // Structured response the AI returns as JSON
 export interface AIResponse {
   zh: string
   pinyin: string
   en: string
   feedback: string
+  nativeSay: NativeSay
   vocab: VocabEntry[]
   corrected: boolean
 }
