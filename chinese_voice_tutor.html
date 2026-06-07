@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>普通话练习 · Mandarin Practice</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#18181b;--ink-2:#52525b;--ink-3:#a1a1aa;
+  --paper:#fafaf9;--card:#ffffff;
+  --red:#b91c1c;--red-soft:#fef2f2;--red-mid:#dc2626;
+  --gold-soft:#fffbeb;--gold-mid:#d97706;--gold-dark:#92400e;
+  --teal-soft:#f0fdfa;--teal-mid:#0d9488;--teal-dark:#0f766e;
+  --purple-soft:#f5f3ff;--purple-mid:#7c3aed;
+  --green:#15803d;--green-soft:#f0fdf4;
+  --border:rgba(24,24,27,0.10);--border-2:rgba(24,24,27,0.18);
+}
+body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+.app{max-width:800px;margin:0 auto;padding:1.75rem 1.5rem}
+
+/* ── Top bar ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--border-2)}
+.logo{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--red-mid)}
+.logo small{font-size:13px;font-weight:400;color:var(--ink-2);font-family:'Outfit',sans-serif;margin-left:8px}
+.el-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);border:0.5px solid var(--border-2);border-radius:20px;padding:4px 12px}
+.el-dot{width:7px;height:7px;border-radius:50%;background:#d4d4d8;transition:background .3s}
+.el-dot.on{background:#22c55e}
+
+/* ── API row ── */
+.api-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.api-row input{flex:1;font-family:'Outfit',sans-serif;font-size:13px;padding:9px 13px;border:0.5px solid var(--border-2);border-radius:9px;background:var(--card);color:var(--ink);outline:none;transition:border-color .15s}
+.api-row input:focus{border-color:var(--red-mid)}
+.api-row input::placeholder{color:var(--ink-3)}
+.api-row input:disabled{opacity:.6}
+.conn-btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:9px 16px;border-radius:9px;border:0.5px solid var(--border-2);background:var(--card);color:var(--ink-2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.conn-btn:hover{border-color:var(--red-mid);color:var(--red-mid)}
+.conn-btn.done{background:var(--red-mid);color:#fff;border-color:var(--red-mid)}
+
+/* ── Curriculum ── */
+.section-label{font-size:11px;font-weight:500;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.lessons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.lcard{border:0.5px solid var(--border);border-radius:13px;padding:14px;background:var(--card);cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.lcard:hover{border-color:var(--border-2)}
+.lcard.active{border-width:1.5px}
+.lcard.active.l1{border-color:var(--red-mid);background:var(--red-soft)}
+.lcard.active.l2{border-color:var(--teal-mid);background:var(--teal-soft)}
+.lcard.active.l3{border-color:var(--gold-mid);background:var(--gold-soft)}
+.lnum{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.l1 .lnum{color:var(--red-mid)}.l2 .lnum{color:var(--teal-mid)}.l3 .lnum{color:var(--gold-mid)}
+.lzh{font-family:'Noto Serif SC',serif;font-size:19px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.len{font-size:12px;color:var(--ink-2);line-height:1.4;margin-bottom:8px}
+.ltags{display:flex;flex-wrap:wrap;gap:4px}
+.ltag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.l1 .ltag{background:#fee2e2;color:#991b1b}
+.l2 .ltag{background:#ccfbf1;color:var(--teal-dark)}
+.l3 .ltag{background:#fef3c7;color:var(--gold-dark)}
+.lcheck{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px}
+.lcard.done .lcheck{display:flex}
+.l1.done .lcheck{background:var(--red-mid);color:#fff}
+.l2.done .lcheck{background:var(--teal-mid);color:#fff}
+.l3.done .lcheck{background:var(--gold-mid);color:#fff}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px}
+.stat-lbl{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.stat-val{font-size:21px;font-weight:600;font-family:'DM Mono',monospace;color:var(--ink)}
+
+/* ── Chat ── */
+.chat{background:var(--card);border:0.5px solid var(--border);border-radius:16px;overflow:hidden}
+.chat-head{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-title{display:flex;align-items:center;gap:8px}
+.chat-zh{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:700;color:var(--ink)}
+.chat-en{font-size:12px;color:var(--ink-3)}
+.chat-btns{display:flex;gap:6px}
+.ibtn{width:30px;height:30px;border-radius:7px;border:0.5px solid var(--border);background:transparent;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s}
+.ibtn:hover{color:var(--ink);border-color:var(--border-2)}
+.ibtn.active-speak{color:var(--red-mid);border-color:var(--red-mid);animation:spk 1s infinite}
+@keyframes spk{0%,100%{opacity:1}50%{opacity:.45}}
+
+.msgs{padding:16px;min-height:320px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:3px}
+
+.mrow{display:flex;gap:10px;align-items:flex-start;animation:min .25s ease both}
+@keyframes min{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.mrow.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-family:'Noto Serif SC',serif;font-weight:700}
+.av.ai{background:var(--red-soft);color:var(--red-mid)}
+.av.me{background:var(--purple-soft);color:var(--purple-mid)}
+.bwrap{max-width:78%;display:flex;flex-direction:column;gap:5px}
+.mrow.user .bwrap{align-items:flex-end}
+.bubble{padding:9px 13px;border-radius:13px;font-size:14px;line-height:1.6}
+.bubble.ai{background:#f4f4f5;border-radius:3px 13px 13px 13px;color:var(--ink)}
+.bubble.user{background:var(--purple-mid);color:#fff;border-radius:13px 3px 13px 13px}
+.zh{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;display:block;margin-bottom:3px}
+.py{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-3);display:block;margin-bottom:3px}
+.en{font-size:12px;color:var(--ink-2);font-style:italic;display:block}
+.fbchip{display:flex;align-items:flex-start;gap:7px;background:var(--green-soft);border:0.5px solid #bbf7d0;border-radius:8px;padding:7px 10px;font-size:12px;color:var(--green);line-height:1.5}
+.fbchip i{font-size:13px;flex-shrink:0;margin-top:1px}
+.replay{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3);cursor:pointer;padding:3px 8px;border-radius:6px;border:0.5px solid var(--border);background:transparent;transition:all .12s;font-family:'Outfit',sans-serif}
+.replay:hover{color:var(--red-mid);border-color:var(--red-mid)}
+.replay i{font-size:12px}
+.dots{display:flex;gap:5px;padding:4px 0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3);animation:db 1.1s infinite}
+.dot:nth-child(2){animation-delay:.18s}.dot:nth-child(3){animation-delay:.36s}
+@keyframes db{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ink-3);font-size:13px;padding:2.5rem 1rem;text-align:center}
+.empty-zh{font-family:'Noto Serif SC',serif;font-size:44px;color:rgba(185,28,28,.1);margin-bottom:4px}
+
+/* ── Starters ── */
+.starters{padding:0 16px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.schip{font-size:12px;padding:4px 11px;border-radius:20px;border:0.5px solid var(--border-2);background:var(--paper);color:var(--ink-2);cursor:pointer;transition:all .13s;font-family:'Outfit',sans-serif}
+.schip:hover{border-color:var(--red-mid);color:var(--red-mid)}
+
+/* ── Input ── */
+.input-zone{padding:12px 16px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.trow{display:flex;gap:8px;align-items:flex-end}
+textarea.ti{flex:1;font-family:'Outfit',sans-serif;font-size:14px;padding:9px 13px;border:0.5px solid var(--border-2);border-radius:10px;background:var(--paper);color:var(--ink);resize:none;outline:none;line-height:1.5;min-height:40px;max-height:90px;transition:border-color .15s}
+textarea.ti:focus{border-color:var(--red-mid)}
+textarea.ti::placeholder{color:var(--ink-3)}
+.sbtn{width:40px;height:40px;border-radius:10px;border:none;background:var(--red-mid);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:opacity .15s}
+.sbtn:hover{opacity:.85}
+.sbtn:disabled{opacity:.35;cursor:not-allowed}
+.vrow{display:flex;align-items:center;gap:10px}
+.mbtn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-2);background:var(--card);color:var(--ink-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:all .2s}
+.mbtn:hover{border-color:var(--red-mid);color:var(--red-mid)}
+.mbtn.rec{background:var(--red-mid);border-color:var(--red-mid);color:#fff;animation:rp 1s infinite}
+@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+.mhint{font-size:12px;color:var(--ink-3)}
+.mhint.on{color:var(--red-mid);font-weight:500}
+
+/* ── Notice ── */
+.notice{font-size:12px;padding:7px 12px;border-radius:8px;margin-bottom:10px;display:none}
+.notice.warn{background:var(--gold-soft);color:var(--gold-dark);border:0.5px solid rgba(217,119,6,.25)}
+.notice.show{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top-bar">
+    <div>
+      <div class="logo">普通话练习 <small>Mandarin Practice</small></div>
+    </div>
+    <div class="el-badge">
+      <div class="el-dot" id="elDot"></div>
+      <span id="elStatus">ElevenLabs: not connected</span>
+    </div>
+  </div>
+
+  <div class="notice warn" id="notice"></div>
+
+  <div class="api-row">
+    <input type="password" id="elKey" placeholder="Paste your ElevenLabs API key to enable voice playback…" autocomplete="off"/>
+    <button class="conn-btn" id="connBtn" onclick="connectEL()">Connect voice</button>
+  </div>
+
+  <div class="section-label" id="currLabel">Curriculum — lesson 1 of 3</div>
+  <div class="lessons">
+    <div class="lcard l1 active" onclick="selectLesson(0)">
+      <div class="lcheck"><i class="ti ti-check"></i></div>
+      <div class="lnum">Lesson 1</div>
+      <div class="lzh">自我介绍</div>
+      <div class="len">Introduce yourself &amp; share your hobbies</div>
+      <div class="ltags"><span class="ltag">名字</span><span class="ltag">爱好</span><span class="ltag">家庭</span></div>
+    </div>
+    <div class="lcard l2" onclick="selectLesson(1)">
+      <div class="lcheck"><i class="ti ti-check"></i></div>
+      <div class="lnum">Lesson 2</div>
+      <div class="lzh">旅行问路</div>
+      <div class="len">Travel, directions &amp; destination tips</div>
+      <div class="ltags"><span class="ltag">地点</span><span class="ltag">方向</span><span class="ltag">推荐</span></div>
+    </div>
+    <div class="lcard l3" onclick="selectLesson(2)">
+      <div class="lcheck"><i class="ti ti-check"></i></div>
+      <div class="lnum">Lesson 3</div>
+      <div class="lzh">美食点餐</div>
+      <div class="len">Food, ordering &amp; favourite dishes</div>
+      <div class="ltags"><span class="ltag">菜单</span><span class="ltag">口味</span><span class="ltag">餐厅</span></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Turns</div><div class="stat-val" id="sTurns">0</div></div>
+    <div class="stat"><div class="stat-lbl">Corrections</div><div class="stat-val" id="sCorr">0</div></div>
+    <div class="stat"><div class="stat-lbl">New words</div><div class="stat-val" id="sVocab">0</div></div>
+    <div class="stat"><div class="stat-lbl">Lesson</div><div class="stat-val" id="sLesson">1 / 3</div></div>
+  </div>
+
+  <div class="chat">
+    <div class="chat-head">
+      <div class="chat-title">
+        <span class="chat-zh" id="topicZh">自我介绍</span>
+        <span class="chat-en" id="topicEn">Introductions &amp; hobbies</span>
+      </div>
+      <div class="chat-btns">
+        <button class="ibtn" id="volBtn" title="Toggle auto-speak" onclick="toggleSpeak()"><i class="ti ti-volume"></i></button>
+        <button class="ibtn" title="New conversation" onclick="resetChat()"><i class="ti ti-refresh"></i></button>
+      </div>
+    </div>
+
+    <div class="msgs" id="msgs">
+      <div class="empty">
+        <div class="empty-zh">开始吧</div>
+        <div>Tap a starter phrase below, or speak / type to begin</div>
+      </div>
+    </div>
+
+    <div class="starters" id="starters"></div>
+
+    <div class="input-zone">
+      <div class="trow">
+        <textarea class="ti" id="ti" placeholder="Type in Chinese, pinyin, or English…" rows="1"></textarea>
+        <button class="sbtn" id="sbtn" onclick="handleSend()"><i class="ti ti-send"></i></button>
+      </div>
+      <div class="vrow">
+        <button class="mbtn" id="mbtn" onclick="toggleMic()" title="Speak in Chinese">
+          <i class="ti ti-microphone"></i>
+        </button>
+        <span class="mhint" id="mhint">Tap to speak in Mandarin</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const LESSONS = [
+  {
+    zh:'自我介绍', en:'Introductions &amp; hobbies',
+    system:`You are 林老师 (Lín Lǎoshī), a warm native Mandarin speaker meeting a beginner student for the first time. Have a genuinely natural conversation about names, where they are from, their hobbies and interests, and family. React genuinely to what the student says. Ask natural follow-up questions like a real person would.
+
+Level: HSK 2 (elementary). Use simple, short sentences. Always provide pinyin. Provide brief English below each response.
+
+Respond ONLY with valid JSON, no extra text:
+{"zh":"your Mandarin reply","pinyin":"full pinyin with tone marks","en":"natural English translation","feedback":"1-2 sentences of kind encouraging feedback on their Chinese grammar or word choice. If they used English, gently encourage them to try Chinese. Empty string if no feedback needed.","vocab":["new word"],"corrected":false}`,
+    starters:['你好！我叫…','我来自美国','我喜欢打篮球','我有一个姐姐']
+  },
+  {
+    zh:'旅行问路', en:'Travel &amp; directions',
+    system:`You are 王导游 (Wáng Dǎoyóu), a friendly local guide in Beijing. Have a natural conversation about getting around the city: asking directions, recommended sights, transport options, travel tips. Be enthusiastic and helpful like a real local who loves their city.
+
+Level: HSK 2 (elementary). Use simple, short sentences. Always provide pinyin. Provide brief English below each response.
+
+Respond ONLY with valid JSON, no extra text:
+{"zh":"your Mandarin reply","pinyin":"full pinyin with tone marks","en":"natural English translation","feedback":"1-2 sentences of kind encouraging feedback on their Chinese grammar or word choice. If they used English, gently encourage them to try Chinese. Empty string if no feedback needed.","vocab":["new word"],"corrected":false}`,
+    starters:['请问，天安门怎么走？','地铁站在哪里？','你推荐去哪里玩？','打车要多少钱？']
+  },
+  {
+    zh:'美食点餐', en:'Food &amp; ordering',
+    system:`You are 小李 (Xiǎo Lǐ), a cheerful and enthusiastic waiter at a popular Beijing restaurant. Have a natural conversation: take their order, recommend dishes, talk about favourite foods, discuss Chinese cuisine. Be warm and excited about food — share your own "favourites" and make them feel welcome.
+
+Level: HSK 2 (elementary). Use simple, short sentences. Always provide pinyin. Provide brief English below each response.
+
+Respond ONLY with valid JSON, no extra text:
+{"zh":"your Mandarin reply","pinyin":"full pinyin with tone marks","en":"natural English translation","feedback":"1-2 sentences of kind encouraging feedback on their Chinese grammar or word choice. If they used English, gently encourage them to try Chinese. Empty string if no feedback needed.","vocab":["new word"],"corrected":false}`,
+    starters:['我想要一碗面','你们有什么推荐？','我不吃辣的','我最喜欢饺子']
+  }
+];
+
+let cur = 0, history = [], turns = 0, corrections = 0, vocab = new Set();
+let elKey = '', voiceId = 'pNInz6obpgDQGcFmaJgB';
+let autoSpeak = true, isSpeaking = false, isLoading = false;
+let isRec = false, recognition = null;
+let lessonDone = [false, false, false];
+
+function showNotice(msg) {
+  const n = document.getElementById('notice');
+  n.textContent = msg; n.className = 'notice warn show';
+  setTimeout(() => n.classList.remove('show'), 5000);
+}
+
+function connectEL() {
+  const k = document.getElementById('elKey').value.trim();
+  if (!k) { showNotice('Please paste your ElevenLabs API key first.'); return; }
+  elKey = k;
+  document.getElementById('elDot').classList.add('on');
+  document.getElementById('elStatus').textContent = 'ElevenLabs: connected';
+  document.getElementById('elStatus').style.color = '#15803d';
+  document.getElementById('connBtn').classList.add('done');
+  document.getElementById('connBtn').textContent = 'Connected ✓';
+  document.getElementById('elKey').disabled = true;
+}
+
+function toggleSpeak() {
+  autoSpeak = !autoSpeak;
+  const b = document.getElementById('volBtn');
+  b.innerHTML = autoSpeak ? '<i class="ti ti-volume"></i>' : '<i class="ti ti-volume-off"></i>';
+}
+
+async function speakText(text) {
+  if (!elKey || !autoSpeak || !text) return;
+  document.getElementById('volBtn').classList.add('active-speak');
+  try {
+    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`, {
+      method: 'POST',
+      headers: { 'xi-api-key': elKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_flash_v2_5',
+        voice_settings: { stability: 0.55, similarity_boost: 0.75, style: 0.25 }
+      })
+    });
+    if (!r.ok) { showNotice('ElevenLabs error — check your API key and remaining credits.'); return; }
+    const blob = await r.blob();
+    const audio = new Audio(URL.createObjectURL(blob));
+    audio.onended = audio.onerror = () => document.getElementById('volBtn').classList.remove('active-speak');
+    audio.play();
+  } catch(e) {
+    document.getElementById('volBtn').classList.remove('active-speak');
+    showNotice('Could not reach ElevenLabs. Check your network connection.');
+  }
+}
+
+function selectLesson(idx) {
+  cur = idx;
+  document.querySelectorAll('.lcard').forEach((c, i) => c.classList.toggle('active', i === idx));
+  document.getElementById('topicZh').textContent = LESSONS[idx].zh;
+  document.getElementById('topicEn').innerHTML = LESSONS[idx].en;
+  document.getElementById('currLabel').textContent = `Curriculum — lesson ${idx+1} of 3`;
+  document.getElementById('sLesson').textContent = `${idx+1} / 3`;
+  resetChat(true);
+  renderStarters();
+}
+
+function renderStarters() {
+  const s = document.getElementById('starters');
+  s.innerHTML = LESSONS[cur].starters
+    .map(t => `<button class="schip" onclick="useStarter(this)">${t}</button>`)
+    .join('');
+}
+
+function useStarter(btn) {
+  document.getElementById('ti').value = btn.textContent;
+  handleSend();
+}
+
+function resetChat(full = true) {
+  if (full) { history = []; turns = 0; corrections = 0; vocab = new Set(); updateStats(); }
+  document.getElementById('msgs').innerHTML = `<div class="empty"><div class="empty-zh">开始吧</div><div>Tap a starter phrase below, or speak / type to begin</div></div>`;
+}
+
+function updateStats() {
+  document.getElementById('sTurns').textContent = turns;
+  document.getElementById('sCorr').textContent = corrections;
+  document.getElementById('sVocab').textContent = vocab.size;
+}
+
+function clearEmpty() {
+  const e = document.getElementById('msgs').querySelector('.empty');
+  if (e) e.remove();
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function addUserMsg(text) {
+  clearEmpty();
+  const m = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'mrow user';
+  d.innerHTML = `<div class="av me">我</div><div class="bwrap"><div class="bubble user">${esc(text)}</div></div>`;
+  m.appendChild(d); m.scrollTop = m.scrollHeight;
+}
+
+function addAIMsg(data) {
+  const m = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'mrow';
+  const zhSafe = (data.zh || '').replace(/'/g, "\\'");
+  d.innerHTML = `
+    <div class="av ai">师</div>
+    <div class="bwrap">
+      <div class="bubble ai">
+        <span class="zh">${esc(data.zh)}</span>
+        <span class="py">${esc(data.pinyin)}</span>
+        <span class="en">${esc(data.en)}</span>
+      </div>
+      ${data.feedback ? `<div class="fbchip"><i class="ti ti-bulb" aria-hidden="true"></i>${esc(data.feedback)}</div>` : ''}
+      <button class="replay" onclick="speakText('${zhSafe}')"><i class="ti ti-player-play" aria-hidden="true"></i> Listen again</button>
+    </div>`;
+  m.appendChild(d); m.scrollTop = m.scrollHeight;
+}
+
+function addTyping() {
+  clearEmpty();
+  const m = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.id = 'typing'; d.className = 'mrow';
+  d.innerHTML = `<div class="av ai">师</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  m.appendChild(d); m.scrollTop = m.scrollHeight;
+}
+function rmTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+async function handleSend() {
+  const inp = document.getElementById('ti');
+  const text = inp.value.trim();
+  if (!text || isLoading) return;
+  isLoading = true;
+  document.getElementById('sbtn').disabled = true;
+  inp.value = ''; inp.style.height = 'auto';
+
+  addUserMsg(text);
+  history.push({ role: 'user', content: text });
+  addTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: LESSONS[cur].system,
+        messages: history
+      })
+    });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const raw = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch { parsed = { zh: raw, pinyin: '', en: '', feedback: '', vocab: [], corrected: false }; }
+
+    rmTyping();
+    addAIMsg(parsed);
+    history.push({ role: 'assistant', content: (parsed.zh || '') + (parsed.en ? ' ' + parsed.en : '') });
+
+    turns++;
+    if (parsed.corrected) corrections++;
+    (parsed.vocab || []).forEach(w => vocab.add(w));
+    updateStats();
+
+    if (turns >= 6 && !lessonDone[cur]) {
+      lessonDone[cur] = true;
+      document.querySelectorAll('.lcard')[cur].classList.add('done');
+    }
+    if (parsed.zh) speakText(parsed.zh);
+
+  } catch(e) {
+    rmTyping();
+    showNotice('Could not reach the AI. Please check your internet connection.');
+  }
+  isLoading = false;
+  document.getElementById('sbtn').disabled = false;
+}
+
+document.getElementById('ti').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+});
+document.getElementById('ti').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 90) + 'px';
+});
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  recognition = new SR();
+  recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'zh-CN';
+  recognition.onstart = () => {
+    isRec = true;
+    document.getElementById('mbtn').classList.add('rec');
+    document.getElementById('mhint').textContent = 'Listening… speak in Mandarin';
+    document.getElementById('mhint').classList.add('on');
+  };
+  recognition.onresult = e => {
+    document.getElementById('ti').value = Array.from(e.results).map(r => r[0].transcript).join('');
+  };
+  recognition.onend = () => {
+    isRec = false;
+    document.getElementById('mbtn').classList.remove('rec');
+    document.getElementById('mhint').textContent = 'Tap to speak in Mandarin';
+    document.getElementById('mhint').classList.remove('on');
+    const v = document.getElementById('ti').value.trim();
+    if (v) handleSend();
+  };
+  recognition.onerror = e => {
+    isRec = false;
+    document.getElementById('mbtn').classList.remove('rec');
+    document.getElementById('mhint').classList.remove('on');
+    document.getElementById('mhint').textContent = e.error === 'not-allowed' ? 'Mic denied — type instead' : 'Mic error — type instead';
+  };
+}
+
+function toggleMic() {
+  if (!SR) { showNotice('Voice input not supported in this browser. Use Chrome or Edge.'); return; }
+  isRec ? recognition.stop() : recognition.start();
+}
+
+renderStarters();
+</script>
+</body>
+</html>
