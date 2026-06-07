@@ -1,3 +1,4 @@
+// Standard TTS endpoint (non-streaming) — simpler CORS behavior than /stream
 const ELEVENLABS_API = 'https://api.elevenlabs.io/v1/text-to-speech'
 const MODEL_ID = 'eleven_flash_v2_5'
 const VOICE_SETTINGS = { stability: 0.55, similarity_boost: 0.75, style: 0.25 }
@@ -21,16 +22,16 @@ export async function speakText(
 ): Promise<void> {
   if (!text.trim()) return
 
-  // Stop any currently playing audio
   stopCurrentAudio()
 
   let res: Response
   try {
-    res = await fetch(`${ELEVENLABS_API}/${voiceId}/stream`, {
+    res = await fetch(`${ELEVENLABS_API}/${voiceId}`, {
       method: 'POST',
       headers: {
         'xi-api-key': apiKey,
         'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
       },
       body: JSON.stringify({
         text,
@@ -39,13 +40,41 @@ export async function speakText(
       }),
     })
   } catch {
-    throw new ElevenLabsError('Could not reach ElevenLabs. Check your network connection.')
+    throw new ElevenLabsError(
+      'Could not reach ElevenLabs. Check your network connection (or try http://localhost:3000 if on https).'
+    )
   }
 
   if (!res.ok) {
-    if (res.status === 401) throw new ElevenLabsError('Invalid ElevenLabs API key.', 401)
-    if (res.status === 429) throw new ElevenLabsError('ElevenLabs credits exhausted or rate limited.', 429)
-    throw new ElevenLabsError(`ElevenLabs error (${res.status}).`, res.status)
+    // Read the body so we can surface what ElevenLabs actually said
+    let detail = ''
+    try {
+      const body = await res.json() as { detail?: { message?: string } | string }
+      if (typeof body.detail === 'string') detail = body.detail
+      else if (body.detail?.message) detail = body.detail.message
+    } catch { /* response wasn't JSON */ }
+
+    if (res.status === 401) {
+      throw new ElevenLabsError(
+        detail
+          ? `ElevenLabs auth failed: ${detail}`
+          : 'Invalid ElevenLabs API key — double-check it in Settings.',
+        401
+      )
+    }
+    if (res.status === 422) {
+      throw new ElevenLabsError(
+        detail ? `ElevenLabs rejected the request: ${detail}` : 'ElevenLabs could not process this text.',
+        422
+      )
+    }
+    if (res.status === 429) {
+      throw new ElevenLabsError('ElevenLabs credits exhausted or rate limited.', 429)
+    }
+    throw new ElevenLabsError(
+      `ElevenLabs error ${res.status}${detail ? ': ' + detail : ''}.`,
+      res.status
+    )
   }
 
   const blob = await res.blob()
