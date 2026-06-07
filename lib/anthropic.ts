@@ -1,13 +1,16 @@
-import type { Message, AIResponse, VocabEntry } from '@/types'
+import type { Message, AIResponse, VocabEntry, NativeSay } from '@/types'
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-6'
+
+const EMPTY_NATIVE_SAY: NativeSay = { zh: '', pinyin: '', en: '' }
 
 const FALLBACK_RESPONSE: AIResponse = {
   zh: '对不起，我没有听清楚。',
   pinyin: 'Duìbuqǐ, wǒ méiyǒu tīng qīngchǔ.',
   en: "Sorry, I didn't catch that.",
   feedback: '',
+  nativeSay: EMPTY_NATIVE_SAY,
   vocab: [],
   corrected: false,
 }
@@ -39,7 +42,7 @@ export async function sendMessage(
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1024,
+        max_tokens: 1536,
         system: systemPrompt,
         messages,
       }),
@@ -72,12 +75,23 @@ function parseAIResponse(raw: string): AIResponse {
       pinyin: parsed.pinyin || '',
       en: parsed.en || '',
       feedback: parsed.feedback || '',
+      nativeSay: normalizeNativeSay(parsed.nativeSay),
       vocab: normalizeVocab(parsed.vocab),
       corrected: parsed.corrected ?? false,
     }
   } catch {
     // If the model returned plain text instead of JSON, display it as-is
     return { ...FALLBACK_RESPONSE, zh: raw, en: '' }
+  }
+}
+
+function normalizeNativeSay(raw: unknown): NativeSay {
+  if (!raw || typeof raw !== 'object') return EMPTY_NATIVE_SAY
+  const obj = raw as Record<string, unknown>
+  return {
+    zh: String(obj.zh || ''),
+    pinyin: String(obj.pinyin || ''),
+    en: String(obj.en || ''),
   }
 }
 
